@@ -24,4 +24,6 @@ Route::group(['prefix' => 'message'], function () {
     Route::put('/updatetextmessage','App\Http\Controllers\message\TextMessageController@updateTextMessage'); 
     Route::delete('/deletetextmessage','App\Http\Controllers\message\TextMessageController@deleteTextMessage');
     Route::post('/searchtextmessage','App\Http\Controllers\message\TextMessageController@searchTextMessage'); 
+
+    Route::get('/getimagemessage', 'App\Http\Controllers\message\ImageMessageController@getImageMessage');
 });
