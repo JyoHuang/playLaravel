@@ -90,4 +90,33 @@ class TextMessageController extends Controller
         ];
         return response()->json($response);
     }
+
+    public function deleteTextMessage(){
+        //取得所有輸入
+        $input = request()->all();
+        //建立檢查輸入的規則
+        $rules = [
+            'id' => [
+                'required',
+            ]
+        ];
+        //檢查看看
+        $validator = Validator::make($input, $rules);
+        if ($validator->fails()) {
+            $response = [
+                'success' => false,
+                'message' => $validator->messages(),
+            ];
+            return response()->json($response);
+        }
+
+        //更新至資料庫
+        DB::table('message_text')
+            ->where('id', $input['id'])
+            ->delete();
+        $response = [
+            'success' => true,
+        ];
+        return response()->json($response);
+    }
 }
