@@ -19,5 +19,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::group(['prefix' => 'message'], function () {
-    Route::get('/gettextmessage', 'App\Http\Controllers\message\TextMessageController@getTextMessage'); 
+    Route::get('/gettextmessage', 'App\Http\Controllers\message\TextMessageController@getTextMessage');
+    Route::post('/addtextmessage','App\Http\Controllers\message\TextMessageController@addTextMessage'); 
 });
