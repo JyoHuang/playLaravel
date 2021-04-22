@@ -26,4 +26,5 @@ Route::group(['prefix' => 'message'], function () {
     Route::post('/searchtextmessage','App\Http\Controllers\message\TextMessageController@searchTextMessage'); 
 
     Route::get('/getimagemessage', 'App\Http\Controllers\message\ImageMessageController@getImageMessage');
+    Route::post('/addimagemessage','App\Http\Controllers\message\ImageMessageController@addImageMessage'); 
 });
