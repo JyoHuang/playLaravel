@@ -8,9 +8,11 @@ use App\connectDBModel\TextMessageModel;  //建立自己的Model
 use DB;
 use Illuminate\Http\Request;
 
-class TextMessageController extends Controller{
-    
-    public function getTextMessage(){
+class TextMessageController extends Controller
+{
+
+    public function getTextMessage()
+    {
         $messages = DB::table('message_text')->get();
 
         $response = [
@@ -20,12 +22,13 @@ class TextMessageController extends Controller{
         return response()->json($response);
     }
 
-    public function addTextMessage(){
+    public function addTextMessage()
+    {
         //取得所有輸入
         $input = request()->all();
         //建立檢查輸入的規則
         $rules = [
-            'message' =>[
+            'message' => [
                 'required',
                 'max:5',
             ]
@@ -53,6 +56,38 @@ class TextMessageController extends Controller{
         return response()->json($response);
     }
 
+    public function updateTextMessage()
+    {
+        //取得所有輸入
+        $input = request()->all();
+        //建立檢查輸入的規則
+        $rules = [
+            'message' => [
+                'required',
+                'max:5',
+            ],
+            'id' => [
+                'required',
+            ]
+        ];
+        //檢查看看
+        $validator = Validator::make($input, $rules);
+        if ($validator->fails()) {
+            $response = [
+                'success' => false,
+                'message' => $validator->messages(),
+            ];
+            return response()->json($response);
+        }
 
+        //更新至資料庫
+        DB::table('message_text')
+            ->where('id', $input['id'])
+            ->update(['message' => $input['message']]);
+        $response = [
+            'success' => true,
+            'message' => $input['message'],
+        ];
+        return response()->json($response);
+    }
 }
-
