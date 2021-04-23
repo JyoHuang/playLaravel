@@ -7,6 +7,8 @@ use Validator;
 use App\connectDBModel\ImageMessageModel;  //建立自己的Model
 use DB;
 use Illuminate\Http\Request;
+use Log;
+use Storage;
 
 class ImageMessageController extends Controller
 {
@@ -137,6 +139,24 @@ class ImageMessageController extends Controller
         $domain_name = request()->root();
         $imageUrl = $domain_name . '/storage/files/' . $fileName;
 
+
+        //4刪除原本的圖片
+        //先刪除原本的圖片
+        $result = DB::table('message_image')
+            ->where('id', $payload['id'])
+            ->first();
+        if (empty($result)) {
+            $response = [
+                'success' => false,
+                'message' => '不存在',
+            ];
+            return $response;
+        }
+        $image_local_to_delete = $result->image_local;
+        $indexOfFilePath = strpos($image_local_to_delete, 'files');
+        $filePath = substr($image_local_to_delete, $indexOfFilePath);
+        $deleteResult = Storage::delete("public/" . $filePath);
+
         //5.把路徑存到資料表中
         //更新至資料庫
         DB::table('message_image')
@@ -148,6 +168,56 @@ class ImageMessageController extends Controller
             'imageUrl' => $imageUrl,
         ];
 
+        return $response;
+    }
+    public function deleteImageMessage()
+    {
+        //取得所有輸入
+        $payload = request()->all();
+        //建立檢查輸入的規則
+        $rules = [
+            'id' => [
+                'required',
+            ]
+        ];
+        //檢查看看
+        $validator = Validator::make($payload, $rules);
+        if ($validator->fails()) {
+            $response = [
+                'success' => false,
+                'message' => $validator->messages(),
+            ];
+            return response()->json($response);
+        }
+
+        $result = DB::table('message_image')
+            ->where('id', $payload['id'])
+            ->first();
+        if (empty($result)) {
+            $response = [
+                'success' => false,
+                'message' => '不存在',
+            ];
+            return $response;
+        }
+
+        //先刪除圖片
+        $image_local_to_delete = $result->image_local;
+        $indexOfFilePath = strpos($image_local_to_delete, 'files');
+        $filePath = substr($image_local_to_delete, $indexOfFilePath);
+        $deleteResult = Storage::delete("public/" . $filePath);
+
+        //再刪除資料庫的內容
+        $result = DB::table('message_image')
+            ->where('id', $payload['id'])
+            ->delete();
+
+        $response = [
+            'success' => true,
+            'image_local_to_delete' => $image_local_to_delete,
+            'filePath' => $filePath,
+            'deleteResult' => $deleteResult
+        ];
         return $response;
     }
 }
