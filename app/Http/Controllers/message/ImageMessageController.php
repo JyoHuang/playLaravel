@@ -220,4 +220,33 @@ class ImageMessageController extends Controller
         ];
         return $response;
     }
+    public function searchImageMessage()
+    {
+        //取得所有輸入
+        $payload = request()->all();
+        //建立檢查輸入的規則
+        $rules = [
+            'id' => [
+                'required',
+            ]
+        ];
+        //檢查看看
+        $validator = Validator::make($payload, $rules);
+        if ($validator->fails()) {
+            $response = [
+                'success' => false,
+                'message' => $validator->messages(),
+            ];
+            return response()->json($response);
+        }
+
+        $result = DB::table('message_image')
+            ->where('id', $payload['id'])
+            ->get();
+        $response = [
+            'success' => true,
+            'message' => $result,
+        ];
+        return $response;
+    }
 }
